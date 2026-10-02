@@ -75,10 +75,37 @@ in
       default = false;
       description = "Enable the configuration of the window-manager";
     };
-    hyprland = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable the configartion of hyprland";
+    hyprland = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable the Hyprland configuration";
+      };
+      primaryMonitor = lib.mkOption {
+        type = lib.types.str;
+        default = "eDP-1";
+        description = "The default monitor for hyprland";
+      };
+      monitors = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ",preferred,auto,1" ];
+        description = "Monitor configuration";
+      };
+      usingAMD = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable the amd var loading";
+      };
+      usingNVIDIA = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable the nvidia var loading";
+      };
+      isLaptop = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable the laptop";
+      };
     };
     hypridle = lib.mkOption {
       type = lib.types.bool;
@@ -109,7 +136,7 @@ in
 
   config = lib.mkIf (!config.window-manager.enable) {
     window-manager = {
-      hyprland = false;
+      hyprland.enable = false;
       hyprlock = false;
       hyprpaper = false;
       hypridle = false;
