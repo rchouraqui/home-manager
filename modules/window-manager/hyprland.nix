@@ -9,10 +9,10 @@
 let
   cfg = config.window-manager.hyprland;
 
-  framework-monitor = "eDP-1, 2560x1600@165, 0x-1080, 1.60";
-
   clamshell = pkgs.writeShellScriptBin "clamshell" ''
     #!/usr/bin/env bash
+
+    INTERNAL_DISPLAY=${cfg.primaryMonitor}
 
     ICON_LAPTOP="computer-laptop"
     ICON_MONITOR="video-display"
@@ -24,14 +24,14 @@ let
     mode_close() {
       MONITORS_COUNT=$(hyprctl monitors all | grep -c "Monitor")
       if [[ $MONITORS_COUNT -gt 1 ]]; then
-        hyprctl keyword monitor "eDP-1, disable"
-      else
-        hyprlock
+        hyprctl keyword monitor "$INTERNAL_DISPLAY, disable"
+        sudo ${pkgs.systemd}/bin/systemctl stop fprintd.service
       fi
     }
 
     mode_open() {
-      hyprctl keyword monitor ${framework-monitor}
+      hyprctl keyword monitor ${pkgs.lib.head cfg.monitors}
+      sudo ${pkgs.systemd}/bin/systemctl start fprintd.service
     }
 
     if [[ "$1" == "close" ]]; then
@@ -56,22 +56,26 @@ let
   '';
 in
 {
-  config = lib.mkIf cfg {
-    home.packages = with pkgs; [
-      clamshell
-      grim
-      slurp
-      wl-clipboard
-      pavucontrol # GUI son
-      networkmanagerapplet # fournit nm-connection-editor
-      wireplumber # fournit wpctl
-      playerctl # pour mpris
-      brightnessctl # pour le module brightness
-      blueman # GUI bluetooth
-      lm_sensors # pour la température CPU
-      swaynotificationcenter
-      libnotify
-    ];
+  config = lib.mkIf cfg.enable {
+    home.packages =
+      with pkgs;
+      [
+        grim
+        slurp
+        wl-clipboard
+        pavucontrol # GUI son
+        networkmanagerapplet # fournit nm-connection-editor
+        wireplumber # fournit wpctl
+        playerctl # pour mpris
+        brightnessctl # pour le module brightness
+        blueman # GUI bluetooth
+        lm_sensors # pour la température CPU
+        swaynotificationcenter
+        libnotify
+      ]
+      ++ lib.optionals (cfg.isLaptop) [
+        clamshell
+      ];
 
     catppuccin = {
       hyprland.enable = false;
@@ -109,28 +113,12 @@ in
       };
       xwayland.enable = true;
       settings = {
+        monitor = cfg.monitors;
+        #framework-monitor
+        #"DP-10, 1920x1080@100, 0x0, 1" # Asus monitor
+        #"DP-9, 1920x1080@60, 1920x0, 1, transform, 1" # Samsung monitor
+        #", preferred, auto, 1" # plug a random monitor
 
-        ################
-        ### MONITORS ###
-        ################
-        monitor = [
-          framework-monitor
-          "DP-10, 1920x1080@100, 0x0, 1" # Asus monitor
-          "DP-9, 1920x1080@60, 1920x0, 1, transform, 1" # Samsung monitor
-          ", preferred, auto, 1" # plug a random monitor
-        ];
-
-        ###################
-        ### MY PROGRAMS ###
-        ###################
-        "$terminal" = "kitty";
-        "$fileManager" = "nautilus";
-        "$menu" = "vicinae toggle";
-        "$browser" = "zen-beta";
-
-        #################
-        ### AUTOSTART ###
-        #################
         "exec-once" = [
           "waybar"
           "swaync"
@@ -141,17 +129,24 @@ in
 
         exec = "clamshell check";
 
-        ############################
-        ### ENVIRONMENT VARIABLES ###
-        #############################
         env = [
           "XCURSOR_SIZE,24"
           "HYPRCURSOR_SIZE,24"
+        ]
+        ++ lib.optionals (cfg.usingNVIDIA) [
+          "LIBVA_DRIVER_NAME=nvidia"
+          "__GLX_VENDOR_LIBRARY_NAME=nvidia"
+          "__NV_PRIME_RENDER_OFFLOAD=1"
+          "__GL_SYNC_TO_VBLANK=0"
+          "__GL_THREADED_OPTIMIZATIONS=1"
+          "NVD_BACKEND=direct"
+
+        ]
+        ++ lib.optionals (cfg.usingAMD) [
+          "LIBVA_DRIVER_NAME=radeonsi"
+          "VDPAU_DRIVER=radeonsi"
         ];
 
-        #####################
-        ### LOOK AND FEEL ###
-        #####################
         general = {
           gaps_in = 3;
           gaps_out = 5;
@@ -229,9 +224,6 @@ in
           disable_hyprland_logo = false;
         };
 
-        #############
-        ### INPUT ###
-        #############
         input = {
           kb_layout = "us";
           kb_variant = "intl";
@@ -252,40 +244,34 @@ in
           sensitivity = -0.5;
         };
 
-        ###################
-        ### KEYBINDINGS ###
-        ###################
         "$mainMod" = "SUPER";
+        "$menu" = "vicinae toggle";
 
         bind = [
-          "$mainMod, RETURN, exec, $terminal"
+          "$mainMod, RETURN, exec, ${pkgs.kitty}/bin/kitty"
           "$mainMod, Q, killactive,"
           "$mainMod, M, exec, command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch exit"
-          "$mainMod, E, exec, $fileManager"
+          "$mainMod, E, exec, ${pkgs.nautilus}/bin/nautilus"
           "$mainMod, V, togglefloating,"
           "$mainMod, SPACE, exec, $menu"
           "$mainMod, P, pseudo, # dwindle"
           "$mainMod, J, layoutmsg, togglesplit"
-          "$mainMod, W, exec, $browser"
-          "SUPER, N, exec, swaync-client -t -sw"
+          "$mainMod, W, exec, zen-beta"
+          "$mainMod, N, exec, swaync-client -t -sw"
           "$mainMod, L, exec, hyprlock"
 
-          #Screenshot
           "$mainMod SHIFT, S, exec, bash -c 'f=~/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png; grim -g \"$(slurp)\" $f && wl-copy --type image/png < $f'"
 
-          # Move focus with mainMod + arrow keys
           "$mainMod, left, movefocus, l"
           "$mainMod, right, movefocus, r"
           "$mainMod, up, movefocus, u"
           "$mainMod, down, movefocus, d"
 
-          #Move active windows in a active worspace
           "$mainMod SHIFT, left, movewindow, l"
           "$mainMod SHIFT, right, movewindow, r"
           "$mainMod SHIFT, up, movewindow, u"
           "$mainMod SHIFT, down, movewindow, d"
 
-          # Switch workspaces with mainMod + [0-9]
           "$mainMod, 1, workspace, 1"
           "$mainMod, 2, workspace, 2"
           "$mainMod, 3, workspace, 3"
@@ -297,7 +283,6 @@ in
           "$mainMod, 9, workspace, 9"
           "$mainMod, 0, workspace, 10"
 
-          # Move active window to a workspace with mainMod + SHIFT + [0-9]
           "$mainMod SHIFT, 1, movetoworkspace, 1"
           "$mainMod SHIFT, 2, movetoworkspace, 2"
           "$mainMod SHIFT, 3, movetoworkspace, 3"
