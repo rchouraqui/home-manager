@@ -68,7 +68,7 @@
           ];
           extraSpecialArgs = {
             inherit inputs;
- 	    nixvim = nixvim.packages.${sys}.default;
+            nixvim = nixvim.packages.${sys}.default;
             zen-browser = if zen-browser.packages ? ${sys} then zen-browser.packages.${sys}.default else null;
           };
         };
@@ -81,6 +81,10 @@
         framework = {
           system = "x86_64-linux";
           path = ./host/framework.nix;
+        };
+        fix = {
+          system = "x86_64-linux";
+          path = ./host/fix.nix;
         };
         server = {
           system = "x86_64-linux";
