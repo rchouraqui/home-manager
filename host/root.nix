@@ -63,7 +63,7 @@ in
 
   window-manager = {
     enable = false;
-    hyprland = false;
+    hyprland.enable = false;
     hypridle = false;
     hyprlock = false;
     hyprpaper = false;
