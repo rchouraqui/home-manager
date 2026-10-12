@@ -115,6 +115,11 @@ in
       default = false;
       description = "Enable the spice Desktop";
     };
+    virt-viewer = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable the virt-viewer";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -128,6 +133,7 @@ in
           [
             prismlauncher
             openjdk
+            oversteer
           ]
         else
           [ ]
@@ -162,6 +168,7 @@ in
       ++ (if cfg.nautilus then [ nautilus ] else [ ])
       ++ (if cfg.blender then [ blender ] else [ ])
       ++ (if cfg.godot then [ godot ] else [ ])
-      ++ (if cfg.spice then [ spice ] else [ ]);
+      ++ (if cfg.spice then [ spice ] else [ ])
+      ++ (if cfg.virt-viewer then [ virt-viewer ] else [ ]);
   };
 }
