@@ -114,10 +114,6 @@ in
       xwayland.enable = true;
       settings = {
         monitor = cfg.monitors;
-        #framework-monitor
-        #"DP-10, 1920x1080@100, 0x0, 1" # Asus monitor
-        #"DP-9, 1920x1080@60, 1920x0, 1, transform, 1" # Samsung monitor
-        #", preferred, auto, 1" # plug a random monitor
 
         "exec-once" = [
           "waybar"
@@ -125,6 +121,9 @@ in
           "nm-applet --indicator"
           "blueman-applet"
           "hyprpaper"
+          "zen-beta"
+          "vesktop"
+          "element-desktop"
         ];
 
         exec = "clamshell check";
@@ -337,7 +336,6 @@ in
             "match:class" = ".*";
             suppress_event = "maximize";
           }
-
           {
             name = "fix-xwayland-drags";
             "match:class" = "^$";
@@ -348,20 +346,23 @@ in
             "match:pin" = false;
             no_focus = true;
           }
-
           {
             name = "move-hyprland-run";
             "match:class" = "hyprland-run";
             move = "20 monitor_h-120";
             float = true;
           }
+          {
+            name = "vesktop";
+            "match:class" = "vesktop";
+            workspace = "10 silent";
+          }
+          {
+            name = "element";
+            "match:class" = "element-desktop";
+            workspace = "10 silent";
+          }
         ];
-
-        workspace = [
-          "1, monitor:DP-10"
-          "10, monitor:DP-9"
-        ];
-
       };
     };
   };
