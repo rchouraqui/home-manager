@@ -137,9 +137,6 @@ in
             zle -N edit-command-line
             bindkey '^x^e' edit-command-line
           '')
-          (lib.mkAfter ''
-            fastfetch
-          '')
         ];
         loginExtra = ''
           eval "$(${pkgs.starship}/bin/starship init zsh)"
