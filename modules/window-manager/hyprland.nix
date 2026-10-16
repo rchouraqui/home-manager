@@ -367,8 +367,8 @@ in
             "match:title" = "Picture-in-Picture";
             float = true;
             pin = true;
-            size = "788,938";
-            move = "10,10";
+            size = "330, 186";
+            move = "(monitor_w-337) 55";
           }
         ];
       };
