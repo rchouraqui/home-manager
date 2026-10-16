@@ -362,6 +362,14 @@ in
             "match:class" = "element-desktop";
             workspace = "10 silent";
           }
+          {
+            name = "PictureinPicture";
+            "match:title" = "Picture-in-Picture";
+            float = true;
+            pin = true;
+            size = "788,938";
+            move = "10,10";
+          }
         ];
       };
     };
