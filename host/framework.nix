@@ -71,7 +71,7 @@ in
       monitors = [
         "eDP-1, 2560x1600@165, 0x-1080, 1.60"
         "DP-10, 1920x1080@100, 0x0, 1" # Asus monitor
-        "DP-9, 1920x1080@60, 1920x0, 1, transform, 1" # Samsung monitor
+        "DP-12, 1920x1080@60, 1920x0, 1, transform, 1" # Samsung monitor
         ", preferred, auto, 1" # plug a random monitor
       ];
     };
