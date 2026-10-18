@@ -68,8 +68,8 @@ in
       primaryMonitor = "DP-10";
       usingNVIDIA = true;
       monitors = [
-        "DP-10, 1920x1080@100, 0x0, 1" # Asus monitor
-        "DP-9, 1920x1080@60, 1920x0, 1, transform, 1" # Samsung monitor
+        "HDMI-A-2, 1920x1080@100, 0x0, 1" # Asus monitor
+        "DP-4, 1920x1080@60, 1920x0, 1, transform, 1" # Samsung monitor
         ", preferred, auto, 1" # plug a random monitor
       ];
     };
