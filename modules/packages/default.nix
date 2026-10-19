@@ -16,12 +16,20 @@ let
       lib
       ;
   };
+  zen = import ./zen.nix {
+    inherit
+      inputs
+      config
+      pkgs
+      lib
+      ;
+  };
   cfg = config.application;
 in
 {
   imports = [
     kitty
-    inputs.zen-browser.homeModules.beta
+    zen
   ];
 
   options.application = {
