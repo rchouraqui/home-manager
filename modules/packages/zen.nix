@@ -98,18 +98,38 @@ in
           pkgs.bitwarden-desktop
         ];
         profiles."default" = {
+          containersForce = true;
+          containers = {
+            Perso = {
+              id = 1;
+              color = "toolbar";
+              icon = "fence";
+            };
+            Licence = {
+              id = 2;
+              color = "toolbar";
+              icon = "briefcase";
+            };
+            HomeLab = {
+              id = 3;
+              color = "toolbar";
+              icon = "circle";
+            };
+          };
           pinsForce = true;
           pinsForceAction = "remove";
           pins = {
             "YouTube" = {
               id = "b2c3d4e5-f6a7-8901-bcde-f12345678901";
               url = "https://www.youtube.com";
+              container = 1;
               position = 104;
               isEssential = true;
             };
             "Github" = {
               id = "d4e5f6a7-b8c9-0123-defa-234567890122";
               url = "https://github.com";
+              container = 1;
               position = 105;
               isEssential = true;
             };
@@ -241,7 +261,7 @@ in
           };
           settings = {
             # UI
-            "ui.textScaleFactor" = 120;
+            "ui.textScaleFactor" = 100;
             "browser.uidensity" = 1;
             "browser.theme.content-theme" = 0;
             "browser.theme.toolbar-theme" = 0;
@@ -253,6 +273,7 @@ in
             "zen.tabs.vertical.right-side" = false;
             "zen.view.use-single-toolbar" = false;
             "zen.welcome-screen.seen" = true;
+            "zen.workspaces.separate-essentials" = false;
 
             # Privacy
             "privacy.trackingprotection.enabled" = true;
