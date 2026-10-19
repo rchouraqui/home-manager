@@ -101,22 +101,43 @@ in
           containersForce = true;
           containers = {
             Perso = {
-              id = 1;
-              color = "toolbar";
-              icon = "fence";
-            };
-            Licence = {
-              id = 2;
-              color = "toolbar";
+              color = "blue";
               icon = "briefcase";
+              id = 1;
+            };
+            Work = {
+              color = "blue";
+              icon = "briefcase";
+              id = 2;
             };
             HomeLab = {
+              color = "blue";
+              icon = "briefcase";
               id = 3;
-              color = "toolbar";
-              icon = "circle";
             };
           };
+
           spacesForce = true;
+          spaces = {
+            "Perso" = {
+              id = "cbd64240-7be3-42a2-b1c5-08b34b887be2";
+              position = 1000;
+              icon = "🏠";
+              container = 1;
+            };
+            "Work" = {
+              id = "cdd10fab-4fc5-494b-9041-325e5759195b";
+              position = 2000;
+              icon = "💼";
+              container = 2;
+            };
+            "HomeLab" = {
+              id = "a544514a-11f5-4e31-869c-a245fbee0eb4";
+              position = 3000;
+              icon = "💼";
+              container = 3;
+            };
+          };
           pinsForce = true;
           pinsForceAction = "remove";
           pins = {
