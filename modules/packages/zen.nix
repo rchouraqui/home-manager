@@ -110,32 +110,21 @@ in
               icon = "briefcase";
               id = 2;
             };
-            HomeLab = {
-              color = "blue";
-              icon = "briefcase";
-              id = 3;
-            };
           };
 
           spacesForce = true;
           spaces = {
             "Perso" = {
-              id = "cbd64240-7be3-42a2-b1c5-08b34b887be2";
+              id = "1bd64240-7be3-42a2-b1c5-08b34b887be2";
               position = 1000;
               icon = "🏠";
               container = 1;
             };
             "Work" = {
-              id = "cdd10fab-4fc5-494b-9041-325e5759195b";
+              id = "2dd10fab-4fc5-494b-9041-325e5759195b";
               position = 2000;
               icon = "💼";
               container = 2;
-            };
-            "HomeLab" = {
-              id = "a544514a-11f5-4e31-869c-a245fbee0eb4";
-              position = 3000;
-              icon = "💼";
-              container = 3;
             };
           };
           pinsForce = true;
@@ -186,10 +175,15 @@ in
             };
 
             #workspace Perso
+            "Jellyfin" = {
+              id = "8ac502dd-3b41-4a33-8bf9-4cc5f2e325b0";
+              url = "https://jellyfin.dprive.fr";
+              container = 1;
+              position = 109;
+            };
 
             #workspace Licence
 
-            #workspace Homelab
           };
           bookmarks = {
             force = true;
