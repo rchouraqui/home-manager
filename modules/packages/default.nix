@@ -123,9 +123,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    programs = {
-      zen-browser.enable = cfg.zen;
-    };
     home.packages =
       with pkgs;
       (
