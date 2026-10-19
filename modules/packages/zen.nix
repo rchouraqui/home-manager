@@ -160,7 +160,7 @@ in
                     name = "sonarr";
                     url = "https://sonarr.dprive.fr";
                   }
-		  {
+                  {
                     name = "htop";
                     url = "https://htop.dprive.fr";
                   }
@@ -211,10 +211,10 @@ in
                     name = "circle";
                     url = "https://community.openclassrooms.com/feed";
                   }
-		  {
-		    name = "claude";
-		    url = "https://claude.ai/new";
-		  }
+                  {
+                    name = "claude";
+                    url = "https://claude.ai/new";
+                  }
                 ];
               }
             ];
@@ -226,24 +226,18 @@ in
           };
           extensions = {
             force = true;
-            packages =
-              with firefox-addons;
-              [
-                bitwarden
-                cookie-editor
-                darkreader
-                foxyproxy-standard
-                return-youtube-dislikes
-                sponsorblock
-                ublock-origin
-                vimium-c
-                violentmonkey
-                wayback-machine
-              ]
-              ++ [
-                (pkgs.lib.patchUnfree firefox-addons.keepa)
-                (pkgs.lib.patchUnfree firefox-addons.wappalyzer)
-              ];
+            packages = with firefox-addons; [
+              bitwarden
+              cookie-editor
+              darkreader
+              foxyproxy-standard
+              return-youtube-dislikes
+              sponsorblock
+              ublock-origin
+              vimium-c
+              violentmonkey
+              wayback-machine
+            ];
           };
           settings = {
             # UI
