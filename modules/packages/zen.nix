@@ -116,9 +116,11 @@ in
               icon = "circle";
             };
           };
+          spacesForce = true;
           pinsForce = true;
           pinsForceAction = "remove";
           pins = {
+            #Essential
             "YouTube" = {
               id = "b2c3d4e5-f6a7-8901-bcde-f12345678901";
               url = "https://www.youtube.com";
@@ -126,13 +128,47 @@ in
               position = 104;
               isEssential = true;
             };
-            "Github" = {
-              id = "d4e5f6a7-b8c9-0123-defa-234567890122";
-              url = "https://github.com";
+            "Gmail" = {
+              id = "7fedbde0-4748-40e6-93e8-948ae6d8f728";
+              url = "https://mail.google.com/mail";
               container = 1;
               position = 105;
               isEssential = true;
             };
+            "Claude" = {
+              id = "d4e5f6a7-b8c9-0123-defa-234567890122";
+              url = "https://claude.ai";
+              container = 1;
+              position = 106;
+              isEssential = true;
+            };
+            "Nextcloud" = {
+              id = "c1c0761f-34b1-447e-99c4-91aad600a240";
+              url = "https://nextcloud.dprive.fr";
+              container = 1;
+              position = 107;
+              isEssential = true;
+            };
+            "Github" = {
+              id = "024ca00e-748c-4259-978a-b105f7523544";
+              url = "https://github.com/rchouraqui/";
+              container = 1;
+              position = 108;
+              isEssential = true;
+            };
+            "Openclassrooms" = {
+              id = "945ce1cd-563c-40e6-98f2-c2288ef4efbb";
+              url = "https://openclassrooms.com/fr/";
+              container = 1;
+              position = 108;
+              isEssential = true;
+            };
+
+            #workspace Perso
+
+            #workspace Licence
+
+            #workspace Homelab
           };
           bookmarks = {
             force = true;
