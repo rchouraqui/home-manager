@@ -175,15 +175,44 @@ in
             };
 
             #workspace Perso
+            "Youtube" = {
+              id = "a4658c13-0fcc-41f7-b466-a32435c78093";
+              url = "https://www.youtube.com/";
+              container = 1;
+              position = 109;
+            };
             "Jellyfin" = {
               id = "8ac502dd-3b41-4a33-8bf9-4cc5f2e325b0";
               url = "https://jellyfin.dprive.fr";
               container = 1;
-              position = 109;
+              position = 110;
             };
-
-            #workspace Licence
-
+	    "Crunchyroll" = {
+	      id = "927c9110-35af-4fcf-ab08-6e5cb6b2f92c";
+	      url = "https://www.crunchyroll.com";
+	      container = 1;
+	      position = 111;
+            }
+	   
+            #workspace Work
+	    "Circle" = {
+	      id = "8a86664d-26e5-40aa-aeed-2b97b6892205";
+	      url = "https://community.openclassrooms.com/feed";
+	      container = 2;
+	      position = 112;
+	    };
+	    "Itconnect" = {
+	      id = "c326f324-fbd4-4202-ae10-7ff3a0cb705f";
+	      url = "https://www.it-connect.fr/";
+	      container = 2;
+	      position = 113;
+	    };
+	    "pve" = {
+	      id = "c198d202-b956-4351-8d4b-c3d7fd61cd17";
+	      url = "https://10.0.10.5:8006";
+	      container = 2;
+	      position = 114;
+	    };
           };
           bookmarks = {
             force = true;
