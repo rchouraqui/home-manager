@@ -63,7 +63,14 @@ in
 
   window-manager = {
     enable = false;
-    hyprland = false;
+    hyprland = {
+      enable = false;
+      primaryMonitor = " ";
+      usingNVIDIA = false;
+      monitors = [
+        ", preferred, auto, 1" # plug a random monitor
+      ];
+    };
     hypridle = false;
     hyprlock = false;
     hyprpaper = false;
@@ -94,6 +101,8 @@ in
     nautilus = false;
     zen = false;
     element = false;
+    blender = false;
+    godot = false;
+    spice = false;
   };
-
 }
