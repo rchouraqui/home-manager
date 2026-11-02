@@ -121,6 +121,7 @@ let
     (bind "${mod} + N" (exec "swaync-client -t -sw") { })
     (bind "${mod} + SPACE" (exec "vicinae toggle") { })
     (bind "${mod} + M" "hl.dsp.exit()" { })
+    (bind "${mod} + J" "hl.dsp.layout(\"togglesplit\")" { })
 
     (bind "${mod} + SHIFT + L" (exec "hyprlock") { })
     (bind "${mod} + V" ''hl.dsp.window.float({ action = "toggle" })'' { })
@@ -216,12 +217,12 @@ let
     {
       name = "vesktop";
       match.class = "vesktop";
-      workspace = "10, silent";
+      workspace = "10 silent";
     }
     {
       name = "element-desktop";
       match.class = "element-desktop";
-      workspace = "10, silent";
+      workspace = "10 silent";
     }
     {
       name = "PictureInPicture";
@@ -322,6 +323,9 @@ in
           input = {
             kb_layout = "us";
             kb_variant = "intl";
+          };
+          dwindle = {
+            preserve_split = true;
           };
         }
         // lib.optionalAttrs cfg.isLaptop {
