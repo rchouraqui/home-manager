@@ -65,15 +65,35 @@ in
     enable = true;
     hyprland = {
       enable = true;
-      primaryMonitor = "DP-10";
+      primaryMonitor = "HDMI-A-2";
       usingNVIDIA = true;
       monitors = [
-        "HDMI-A-2, 1920x1080@100, 0x0, 1" # Asus monitor
-        "DP-4, 1920x1080@60, 1920x0, 1, transform, 1" # Samsung monitor
-        ", preferred, auto, 1" # plug a random monitor
+        {
+          output = "HDMI-A-2";
+          mode = "1920x1080@100";
+          position = "0x0";
+          scale = 1;
+          transform = 0;
+        }
+        {
+          output = "DP-4";
+          mode = "1920x1080@60";
+          position = "1920x0";
+          scale = 1;
+          transform = 1;
+        }
+        {
+          output = "";
+          mode = "preferred";
+          position = "auto";
+          scale = 1;
+        }
       ];
       workspaces = [
-        "10, monitor:DP-4"
+        {
+          workspace = "10";
+          monitor = "DP-4";
+        }
       ];
     };
     hypridle = true;
