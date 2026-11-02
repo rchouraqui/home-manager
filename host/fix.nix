@@ -72,6 +72,9 @@ in
         "DP-4, 1920x1080@60, 1920x0, 1, transform, 1" # Samsung monitor
         ", preferred, auto, 1" # plug a random monitor
       ];
+      workspaces = [
+        "10, monitor:DP-4"
+      ];
     };
     hypridle = true;
     hyprlock = true;

@@ -91,6 +91,11 @@ in
         default = [ ",preferred,auto,1" ];
         description = "Monitor configuration";
       };
+      workspaces = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        description = "Workspaces configuration";
+      };
       usingAMD = lib.mkOption {
         type = lib.types.bool;
         default = false;

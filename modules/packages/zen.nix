@@ -131,23 +131,23 @@ in
           pinsForceAction = "remove";
           pins = {
             #Essential
-            "YouTube" = {
-              id = "b2c3d4e5-f6a7-8901-bcde-f12345678901";
-              url = "https://www.youtube.com";
-              container = 1;
-              position = 104;
-              isEssential = true;
-            };
             "Gmail" = {
               id = "7fedbde0-4748-40e6-93e8-948ae6d8f728";
               url = "https://mail.google.com/mail";
               container = 1;
-              position = 105;
+              position = 104;
               isEssential = true;
             };
             "Claude" = {
               id = "d4e5f6a7-b8c9-0123-defa-234567890122";
               url = "https://claude.ai";
+              container = 1;
+              position = 105;
+              isEssential = true;
+            };
+            "YouTube" = {
+              id = "b2c3d4e5-f6a7-8901-bcde-f12345678901";
+              url = "https://www.youtube.com";
               container = 1;
               position = 106;
               isEssential = true;

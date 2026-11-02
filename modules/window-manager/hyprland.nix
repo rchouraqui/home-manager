@@ -114,7 +114,7 @@ in
       xwayland.enable = true;
       settings = {
         monitor = cfg.monitors;
-
+        workspace = cfg.workspaces;
         "exec-once" = [
           "waybar"
           "swaync"

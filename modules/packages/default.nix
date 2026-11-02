@@ -136,9 +136,8 @@ in
       (
         if cfg.prismlauncher then
           [
-            prismlauncher
-            openjdk
-            oversteer
+            #            prismlauncher
+            #openjdk
           ]
         else
           [ ]
