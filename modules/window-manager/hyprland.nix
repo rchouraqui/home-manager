@@ -8,29 +8,40 @@
 
 let
   cfg = config.window-manager.hyprland;
+  mod = "SUPER";
+  lua = lib.generators.mkLuaInline;
+  toLua = lib.generators.toLua { multiline = false; };
+  exec = cmd: "hl.dsp.exec_cmd(${builtins.toJSON cmd})";
+  bind = key: dsp: opts: {
+    _args = [
+      key
+      (lua dsp)
+    ]
+    ++ lib.optional (opts != { }) opts;
+  };
+
+  monitorOpen = "hl.monitor(${toLua ((lib.head cfg.monitors) // { disabled = false; })})";
 
   clamshell = pkgs.writeShellScriptBin "clamshell" ''
-    #!/usr/bin/env bash
-
     INTERNAL_DISPLAY=${cfg.primaryMonitor}
 
     ICON_LAPTOP="computer-laptop"
     ICON_MONITOR="video-display"
 
     notify_user() {
-      notify-send -i "$3" "$1" "$2"
+      ${pkgs.libnotify}/bin/notify-send -i "$3" "$1" "$2"
     }
 
     mode_close() {
       MONITORS_COUNT=$(hyprctl monitors all | grep -c "Monitor")
       if [[ $MONITORS_COUNT -gt 1 ]]; then
-        hyprctl keyword monitor "$INTERNAL_DISPLAY, disable"
+        hyprctl eval "hl.monitor({ output = \"$INTERNAL_DISPLAY\", disabled = true })"
         sudo ${pkgs.systemd}/bin/systemctl stop fprintd.service
       fi
     }
 
     mode_open() {
-      hyprctl keyword monitor ${pkgs.lib.head cfg.monitors}
+      hyprctl eval '${monitorOpen}'
       sudo ${pkgs.systemd}/bin/systemctl start fprintd.service
     }
 
@@ -54,9 +65,177 @@ let
       exit 1
     fi
   '';
+
+  envVars = {
+    XCURSOR_SIZE = "24";
+    HYPRCURSOR_SIZE = "24";
+  }
+  // lib.optionalAttrs cfg.usingNVIDIA {
+    LIBVA_DRIVER_NAME = "nvidia";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    __NV_PRIME_RENDER_OFFLOAD = "1";
+    __GL_SYNC_TO_VBLANK = "0";
+    __GL_THREADED_OPTIMIZATIONS = "1";
+    NVD_BACKEND = "direct";
+  }
+  // lib.optionalAttrs cfg.usingAMD {
+    LIBVA_DRIVER_NAME = "radeonsi";
+    VDPAU_DRIVER = "radeonsi";
+  };
+
+  startup = [
+    ''hyprctl setcursor "Catppuccin-Mocha-Dark" 24''
+    "pw-metadata -n settings 0 clock.force-quantum 512"
+    "xrandr --output ${cfg.primaryMonitor} --primary"
+    "waybar"
+    "swaync"
+    "nm-applet --indicator"
+    "blueman-applet"
+    "hyprpaper"
+    "zen-beta"
+    "vesktop"
+    "element-desktop"
+  ]
+  ++ lib.optionals cfg.isLaptop [
+    "upower"
+    "clamshell check"
+  ];
+
+  startupFn = ''
+    function()
+    ${lib.concatMapStringsSep "\n" (c: "  hl.exec_cmd(${builtins.toJSON c})") startup}
+    end'';
+  reloadFn = ''
+    function()
+      hl.exec_cmd("clamshell check")
+    end'';
+
+  workspaceKeys = lib.range 1 10;
+  keyOf = i: if i == 10 then "0" else toString i;
+
+  binds = [
+    (bind "${mod} + Q" "hl.dsp.window.close()" { })
+    (bind "${mod} + RETURN" (exec "${pkgs.kitty}/bin/kitty") { })
+    (bind "${mod} + W" (exec "zen-beta") { })
+    (bind "${mod} + E" (exec "${pkgs.nautilus}/bin/nautilus") { })
+    (bind "${mod} + N" (exec "swaync-client -t -sw") { })
+    (bind "${mod} + SPACE" (exec "vicinae toggle") { })
+    (bind "${mod} + M" "hl.dsp.exit()" { })
+
+    (bind "${mod} + SHIFT + L" (exec "hyprlock") { })
+    (bind "${mod} + V" ''hl.dsp.window.float({ action = "toggle" })'' { })
+    (bind "${mod} + F" "hl.dsp.window.fullscreen()" { })
+
+    (bind "${mod} + left" ''hl.dsp.focus({ direction = "left" })'' { })
+    (bind "${mod} + right" ''hl.dsp.focus({ direction = "right" })'' { })
+    (bind "${mod} + up" ''hl.dsp.focus({ direction = "up" })'' { })
+    (bind "${mod} + down" ''hl.dsp.focus({ direction = "down" })'' { })
+
+    (bind "${mod} + SHIFT + left" ''hl.dsp.window.move({ direction = "left" })'' { })
+    (bind "${mod} + SHIFT + right" ''hl.dsp.window.move({ direction = "right" })'' { })
+    (bind "${mod} + SHIFT + up" ''hl.dsp.window.move({ direction = "up" })'' { })
+    (bind "${mod} + SHIFT + down" ''hl.dsp.window.move({ direction = "down" })'' { })
+
+    (bind "${mod} + mouse_down" ''hl.dsp.focus({ workspace = "e+1" })'' { })
+    (bind "${mod} + mouse_up" ''hl.dsp.focus({ workspace = "e-1" })'' { })
+
+    (bind "${mod} + SHIFT + S"
+      (exec "bash -c 'f=~/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png; grim -g \"$(slurp)\" $f && wl-copy --type image/png < $f'")
+      { }
+    )
+
+    (bind "${mod} + mouse:272" "hl.dsp.window.drag()" { mouse = true; })
+    (bind "${mod} + mouse:273" "hl.dsp.window.resize()" { mouse = true; })
+
+    (bind "XF86AudioRaiseVolume" (exec "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+") {
+      locked = true;
+      repeating = true;
+    })
+    (bind "XF86AudioLowerVolume" (exec "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-") {
+      locked = true;
+      repeating = true;
+    })
+    (bind "XF86AudioMute" (exec "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle") {
+      locked = true;
+      repeating = true;
+    })
+    (bind "XF86AudioNext" (exec "playerctl next") {
+      locked = true;
+      repeating = true;
+    })
+    (bind "XF86AudioPause" (exec "playerctl play-pause") {
+      locked = true;
+      repeating = true;
+    })
+    (bind "XF86AudioPlay" (exec "playerctl play-pause") {
+      locked = true;
+      repeating = true;
+    })
+    (bind "XF86AudioPrev" (exec "playerctl previous") {
+      locked = true;
+      repeating = true;
+    })
+    (bind "XF86MonBrightnessDown" (exec "brightnessctl set 10%-") {
+      locked = true;
+      repeating = true;
+    })
+    (bind "XF86MonBrightnessUp" (exec "brightnessctl set 10%+ ") {
+      locked = true;
+      repeating = true;
+    })
+  ]
+  ++ lib.optionals cfg.isLaptop [
+    (bind "switch:on:Lid Switch" (exec "clamshell close") { locked = true; })
+    (bind "switch:off:Lid Switch" (exec "clamshell open") { locked = true; })
+  ]
+  ++ map (
+    i: bind "${mod} + ${keyOf i}" "hl.dsp.focus({ workspace = ${toString i} })" { }
+  ) workspaceKeys
+  ++ map (
+    i: bind "${mod} + SHIFT + ${keyOf i}" "hl.dsp.window.move({ workspace = ${toString i} })" { }
+  ) workspaceKeys;
+
+  windowRules = [
+    {
+      name = "suppress-maximize-events";
+      match.class = ".*";
+      suppress_event = "maximize";
+    }
+    {
+      name = "fix-xwayland-drags";
+      match = {
+        class = "^$";
+        title = "^$";
+        xwayland = true;
+        float = true;
+        fullscreen = false;
+        pin = false;
+      };
+      no_focus = true;
+    }
+    {
+      name = "vesktop";
+      match.class = "vesktop";
+      workspace = "10, silent";
+    }
+    {
+      name = "element-desktop";
+      match.class = "element-desktop";
+      workspace = "10, silent";
+    }
+    {
+      name = "PictureInPicture";
+      match.title = "Picture-in-Picture";
+      float = true;
+      pin = true;
+      size = "330, 186";
+      move = "(monitor_w-337) 55";
+    }
+  ];
 in
 {
   config = lib.mkIf cfg.enable {
+
     home.packages =
       with pkgs;
       [
@@ -73,9 +252,9 @@ in
         swaynotificationcenter
         libnotify
       ]
-      ++ lib.optionals (cfg.isLaptop) [
-        clamshell
-      ];
+      ++ lib.optionals cfg.isLaptop [ clamshell ];
+
+    home.pointerCursor.enable = true;
 
     catppuccin = {
       hyprland.enable = false;
@@ -104,271 +283,94 @@ in
 
     wayland.windowManager.hyprland = {
       enable = true;
-      configType = "hyprlang";
-      systemd = {
-        enable = true;
-        variables = [
-          "--all"
-        ];
-      };
+      configType = "lua";
+      systemd.enable = true;
       xwayland.enable = true;
+
       settings = {
+        config = {
+          general = {
+            gaps_in = 3;
+            gaps_out = 5;
+            border_size = 2;
+            col = {
+              active_border = {
+                colors = [
+                  "rgba(cba6f7ee)"
+                  "rgba(89b4faee)"
+                ];
+                angle = 45;
+              };
+              inactive_border = "rgba(181825aa)";
+            };
+            resize_on_border = false;
+            allow_tearing = false;
+          };
+          decoration = {
+            rounding = 10;
+            rounding_power = 2;
+            active_opacity = 1.0;
+            inactive_opacity = 1.0;
+
+            shadow = {
+              enabled = true;
+              range = 4;
+              render_power = 3;
+              color = "rgba(1a1a1aee)";
+            };
+          };
+          input = {
+            kb_layout = "us";
+            kb_variant = "intl";
+          };
+        }
+        // lib.optionalAttrs cfg.isLaptop {
+          input.touchpad = {
+            natural_scroll = true;
+            disable_while_typing = true;
+          };
+        };
+
+        env = lib.mapAttrsToList (name: value: {
+          _args = [
+            name
+            value
+          ];
+        }) envVars;
+
         monitor = cfg.monitors;
-        workspace = cfg.workspaces;
-        "exec-once" = [
-          "waybar"
-          "swaync"
-          "nm-applet --indicator"
-          "blueman-applet"
-          "hyprpaper"
-          "zen-beta"
-          "vesktop"
-          "element-desktop"
+        workspace_rule = cfg.workspaces;
+
+        gesture = lib.optionals cfg.isLaptop [
+          {
+            fingers = 4;
+            direction = "horizontal";
+            action = "workspace";
+          }
+          {
+            fingers = 3;
+            direction = "horizontal";
+            action = "workspace";
+          }
         ];
 
-        exec = "clamshell check";
+        bind = binds;
+        window_rule = windowRules;
 
-        env = [
-          "XCURSOR_SIZE,24"
-          "HYPRCURSOR_SIZE,24"
+        on = [
+          {
+            _args = [
+              "hyprland.start"
+              (lua startupFn)
+            ];
+          }
         ]
-        ++ lib.optionals (cfg.usingNVIDIA) [
-          "LIBVA_DRIVER_NAME=nvidia"
-          "__GLX_VENDOR_LIBRARY_NAME=nvidia"
-          "__NV_PRIME_RENDER_OFFLOAD=1"
-          "__GL_SYNC_TO_VBLANK=0"
-          "__GL_THREADED_OPTIMIZATIONS=1"
-          "NVD_BACKEND=direct"
-
-        ]
-        ++ lib.optionals (cfg.usingAMD) [
-          "LIBVA_DRIVER_NAME=radeonsi"
-          "VDPAU_DRIVER=radeonsi"
-        ];
-
-        general = {
-          gaps_in = 3;
-          gaps_out = 5;
-          border_size = 2;
-          "col.active_border" = "rgba(33ccffee) rgba(00ff99ee) 45deg";
-          "col.inactive_border" = "rgba(595959aa)";
-          resize_on_border = false;
-          allow_tearing = false;
-          layout = "dwindle";
-        };
-
-        decoration = {
-          rounding = 10;
-          rounding_power = 2;
-          active_opacity = 1.0;
-          inactive_opacity = 1.0;
-
-          shadow = {
-            enabled = true;
-            range = 4;
-            render_power = 3;
-            color = "rgba(1a1a1aee)";
-          };
-
-          blur = {
-            enabled = true;
-            size = 3;
-            passes = 1;
-            vibrancy = 0.1696;
-          };
-        };
-
-        animations = {
-          enabled = true;
-
-          bezier = [
-            "easeOutQuint,   0.23, 1,    0.32, 1"
-            "easeInOutCubic, 0.65, 0.05, 0.36, 1"
-            "linear,         0,    0,    1,    1"
-            "almostLinear,   0.5,  0.5,  0.75, 1"
-            "quick,          0.15, 0,    0.1,  1"
-          ];
-
-          animation = [
-            "global,        1,     10,    default"
-            "border,        1,     5.39,  easeOutQuint"
-            "windows,       1,     4.79,  easeOutQuint"
-            "windowsIn,     1,     4.1,   easeOutQuint, popin 87%"
-            "windowsOut,    1,     1.49,  linear,       popin 87%"
-            "fadeIn,        1,     1.73,  almostLinear"
-            "fadeOut,       1,     1.46,  almostLinear"
-            "fade,          1,     3.03,  quick"
-            "layers,        1,     3.81,  easeOutQuint"
-            "layersIn,      1,     4,     easeOutQuint, fade"
-            "layersOut,     1,     1.5,   linear,       fade"
-            "fadeLayersIn,  1,     1.79,  almostLinear"
-            "fadeLayersOut, 1,     1.39,  almostLinear"
-            "workspaces,    1,     1.94,  almostLinear, fade"
-            "workspacesIn,  1,     1.21,  almostLinear, fade"
-            "workspacesOut, 1,     1.94,  almostLinear, fade"
-            "zoomFactor,    1,     7,     quick"
-          ];
-        };
-
-        dwindle = {
-          preserve_split = true;
-        };
-
-        master = {
-          new_status = "master";
-        };
-
-        misc = {
-          force_default_wallpaper = -1;
-          disable_hyprland_logo = false;
-        };
-
-        input = {
-          kb_layout = "us";
-          kb_variant = "intl";
-
-          follow_mouse = 1;
-
-          sensitivity = 0;
-
-          touchpad = {
-            natural_scroll = false;
-          };
-        };
-
-        gesture = "3, horizontal, workspace";
-
-        device = {
-          name = "epic-mouse-v1";
-          sensitivity = -0.5;
-        };
-
-        "$mainMod" = "SUPER";
-        "$menu" = "vicinae toggle";
-
-        bind = [
-          "$mainMod, RETURN, exec, ${pkgs.kitty}/bin/kitty"
-          "$mainMod, Q, killactive,"
-          "$mainMod, M, exec, command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch exit"
-          "$mainMod, E, exec, ${pkgs.nautilus}/bin/nautilus"
-          "$mainMod, V, togglefloating,"
-          "$mainMod, SPACE, exec, $menu"
-          "$mainMod, P, pseudo, # dwindle"
-          "$mainMod, J, layoutmsg, togglesplit"
-          "$mainMod, W, exec, zen-beta"
-          "$mainMod, N, exec, swaync-client -t -sw"
-          "$mainMod, L, exec, hyprlock"
-
-          "$mainMod SHIFT, S, exec, bash -c 'f=~/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png; grim -g \"$(slurp)\" $f && wl-copy --type image/png < $f'"
-
-          "$mainMod, left, movefocus, l"
-          "$mainMod, right, movefocus, r"
-          "$mainMod, up, movefocus, u"
-          "$mainMod, down, movefocus, d"
-
-          "$mainMod SHIFT, left, movewindow, l"
-          "$mainMod SHIFT, right, movewindow, r"
-          "$mainMod SHIFT, up, movewindow, u"
-          "$mainMod SHIFT, down, movewindow, d"
-
-          "$mainMod, 1, workspace, 1"
-          "$mainMod, 2, workspace, 2"
-          "$mainMod, 3, workspace, 3"
-          "$mainMod, 4, workspace, 4"
-          "$mainMod, 5, workspace, 5"
-          "$mainMod, 6, workspace, 6"
-          "$mainMod, 7, workspace, 7"
-          "$mainMod, 8, workspace, 8"
-          "$mainMod, 9, workspace, 9"
-          "$mainMod, 0, workspace, 10"
-
-          "$mainMod SHIFT, 1, movetoworkspace, 1"
-          "$mainMod SHIFT, 2, movetoworkspace, 2"
-          "$mainMod SHIFT, 3, movetoworkspace, 3"
-          "$mainMod SHIFT, 4, movetoworkspace, 4"
-          "$mainMod SHIFT, 5, movetoworkspace, 5"
-          "$mainMod SHIFT, 6, movetoworkspace, 6"
-          "$mainMod SHIFT, 7, movetoworkspace, 7"
-          "$mainMod SHIFT, 8, movetoworkspace, 8"
-          "$mainMod SHIFT, 9, movetoworkspace, 9"
-          "$mainMod SHIFT, 0, movetoworkspace, 10"
-
-          # Example special workspace (scratchpad)
-          "$mainMod, S, togglespecialworkspace, magic"
-          #"$mainMod SHIFT, S, movetoworkspace, special:magic"
-
-          # Scroll through existing workspaces with mainMod + scroll
-          "$mainMod, mouse_down, workspace, e+1"
-          "$mainMod, mouse_up, workspace, e-1"
-        ];
-
-        # Move/resize windows with mainMod + LMB/RMB and dragging
-        bindm = [
-          "$mainMod, mouse:272, movewindow"
-          "$mainMod, mouse:273, resizewindow"
-        ];
-
-        # Laptop multimedia keys for volume and LCD brightness
-        bindel = [
-          ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
-          ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-          ", XF86MonBrightnessUp,   exec, brightnessctl set 5%+"
-          ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
-        ];
-
-        bindl = [
-          ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-          ", XF86AudioNext, exec, playerctl next"
-          ", XF86AudioPause, exec, playerctl play-pause"
-          ", XF86AudioPlay, exec, playerctl play-pause"
-          ", XF86AudioPrev, exec, playerctl previous"
-          ",XF86AudioLowerVolume, exec, pamixer -d 5"
-          ",XF86AudioRaiseVolume, exec, pamixer -i 5"
-          ",XF86MonBrightnessDown, exec, brightnessctl set 10%-"
-          ",XF86MonBrightnessUp, exec, brightnessctl set 10%+ "
-          ", switch:on:Lid Switch, exec, clamshell close"
-          ", switch:off:Lid Switch, exec, clamshell open"
-        ];
-
-        windowrule = [
+        ++ lib.optionals cfg.isLaptop [
           {
-            name = "suppress-maximize-events";
-            "match:class" = ".*";
-            suppress_event = "maximize";
-          }
-          {
-            name = "fix-xwayland-drags";
-            "match:class" = "^$";
-            "match:title" = "^$";
-            "match:xwayland" = true;
-            "match:float" = true;
-            "match:fullscreen" = false;
-            "match:pin" = false;
-            no_focus = true;
-          }
-          {
-            name = "move-hyprland-run";
-            "match:class" = "hyprland-run";
-            move = "20 monitor_h-120";
-            float = true;
-          }
-          {
-            name = "vesktop";
-            "match:class" = "vesktop";
-            workspace = "10 silent";
-          }
-          {
-            name = "element";
-            "match:class" = "element-desktop";
-            workspace = "10 silent";
-          }
-          {
-            name = "PictureinPicture";
-            "match:title" = "Picture-in-Picture";
-            float = true;
-            pin = true;
-            size = "330, 186";
-            move = "(monitor_w-337) 55";
+            _args = [
+              "config.reloaded"
+              (lua reloadFn)
+            ];
           }
         ];
       };
