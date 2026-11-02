@@ -87,12 +87,19 @@ in
         description = "The default monitor for hyprland";
       };
       monitors = lib.mkOption {
-        type = lib.types.listOf lib.types.str;
-        default = [ ",preferred,auto,1" ];
+        type = lib.types.listOf lib.types.attrs;
+        default = [
+          {
+            output = "";
+            mode = "preferred";
+            position = "auto";
+            scale = 1;
+          }
+        ];
         description = "Monitor configuration";
       };
       workspaces = lib.mkOption {
-        type = lib.types.listOf lib.types.str;
+        type = lib.types.listOf lib.types.attrs;
         default = [ ];
         description = "Workspaces configuration";
       };
