@@ -75,6 +75,7 @@ in
     hyprpaper
     vicinae
     waybar
+    noctalia
   ];
 
   options.window-manager = {
