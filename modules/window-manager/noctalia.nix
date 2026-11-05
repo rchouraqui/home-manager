@@ -7,7 +7,7 @@
 }:
 let
   cfg = config.window-manager.noctalia;
-  wallpaper = "./wallpaper/";
+  wallpaper = "${config.home.homeDirectory}/.config/home-manager/modules/window-manager/wallpaper";
 in
 {
   imports = [ inputs.noctalia.homeModules.default ];
