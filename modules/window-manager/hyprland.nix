@@ -8,6 +8,7 @@
 
 let
   cfg = config.window-manager.hyprland;
+  ipc = "noctalia msg";
   mod = "SUPER";
   lua = lib.generators.mkLuaInline;
   toLua = lib.generators.toLua { multiline = false; };
@@ -87,7 +88,8 @@ let
     ''hyprctl setcursor "Catppuccin-Mocha-Dark" 24''
     "pw-metadata -n settings 0 clock.force-quantum 512"
     "xrandr --output ${cfg.primaryMonitor} --primary"
-    "waybar"
+    #"waybar"
+    "noctalia"
     "swaync"
     "nm-applet --indicator"
     "blueman-applet"
