@@ -136,8 +136,8 @@ in
       (
         if cfg.prismlauncher then
           [
-            #            prismlauncher
-            #openjdk
+            prismlauncher
+            openjdk
           ]
         else
           [ ]
