@@ -55,6 +55,14 @@ let
       lib
       ;
   };
+  noctalia = import ./noctalia.nix {
+    inherit
+      inputs
+      config
+      pkgs
+      lib
+      ;
+  };
 
   cfg = config.window-manager;
 
@@ -144,6 +152,11 @@ in
       default = false;
       description = "Enable the configartion of waybar";
     };
+    noctalia = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable the configartion of noctalia";
+    };
   };
 
   config = lib.mkIf (!config.window-manager.enable) {
@@ -154,6 +167,7 @@ in
       hypridle = false;
       vicinae = false;
       waybar = false;
+      noctalia = false;
     };
 
     catppuccin.accent = "mauve";
