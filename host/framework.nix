@@ -69,17 +69,83 @@ in
       isLaptop = true;
       usingAMD = true;
       monitors = [
-        "eDP-1, 2560x1600@165, 0x-1080, 1.60"
-        "DP-10, 1920x1080@100, 0x0, 1" # Asus monitor
-        "DP-12, 1920x1080@60, 1920x0, 1, transform, 1" # Samsung monitor
-        ", preferred, auto, 1" # plug a random monitor
+        {
+          output = "eDP-1";
+          mode = "2560x1600@165";
+          position = "0x0";
+          scale = 1.60;
+          transform = 0;
+        }
+        {
+          output = "HDMI-A-2";
+          mode = "1920x1080@100";
+          position = "0x0";
+          scale = 1;
+          transform = 0;
+        }
+        {
+          output = "DP-4";
+          mode = "1920x1080@60";
+          position = "1920x0";
+          scale = 1;
+          transform = 1;
+        }
+        {
+          output = "";
+          mode = "preferred";
+          position = "auto";
+          scale = 1;
+        }
+      ];
+      workspaces = [
+        {
+          workspace = "1";
+          monitor = "HDMI-A-2";
+        }
+        {
+          workspace = "2";
+          monitor = "HDMI-A-2";
+        }
+        {
+          workspace = "3";
+          monitor = "HDMI-A-2";
+        }
+        {
+          workspace = "4";
+          monitor = "HDMI-A-2";
+        }
+        {
+          workspace = "5";
+          monitor = "HDMI-A-2";
+        }
+        {
+          workspace = "6";
+          monitor = "HDMI-A-2";
+        }
+        {
+          workspace = "7";
+          monitor = "DP-4";
+        }
+        {
+          workspace = "8";
+          monitor = "DP-4";
+        }
+        {
+          workspace = "9";
+          monitor = "DP-4";
+        }
+        {
+          workspace = "10";
+          monitor = "DP-4";
+        }
       ];
     };
     hypridle = true;
     hyprlock = true;
     hyprpaper = true;
     vicinae = true;
-    waybar = true;
+    waybar = false;
+    noctalia = true;
   };
 
   catppuccin = {
