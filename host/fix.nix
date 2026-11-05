@@ -91,6 +91,42 @@ in
       ];
       workspaces = [
         {
+          workspace = "1";
+          monitor = "HDMI-A-2";
+        }
+        {
+          workspace = "2";
+          monitor = "HDMI-A-2";
+        }
+        {
+          workspace = "3";
+          monitor = "HDMI-A-2";
+        }
+        {
+          workspace = "4";
+          monitor = "HDMI-A-2";
+        }
+        {
+          workspace = "5";
+          monitor = "HDMI-A-2";
+        }
+        {
+          workspace = "6";
+          monitor = "HDMI-A-2";
+        }
+        {
+          workspace = "7";
+          monitor = "DP-4";
+        }
+        {
+          workspace = "8";
+          monitor = "DP-4";
+        }
+        {
+          workspace = "9";
+          monitor = "DP-4";
+        }
+        {
           workspace = "10";
           monitor = "DP-4";
         }
@@ -100,7 +136,8 @@ in
     hyprlock = true;
     hyprpaper = true;
     vicinae = true;
-    waybar = true;
+    waybar = false;
+    noctalia = true;
   };
 
   catppuccin = {
