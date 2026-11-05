@@ -10,9 +10,9 @@ let
   wallpaper = "/home/${config.home.username}/Pictures/";
 in
 {
-  config = lib.mkIf cfg {
-    imports = [ inputs.noctalia.homeModules.default ];
+  imports = [ inputs.noctalia.homeModules.default ];
 
+  config = lib.mkIf cfg {
     programs.noctalia = {
       enable = true;
 
