@@ -321,14 +321,18 @@ in
               color = "rgba(1a1a1aee)";
             };
           };
+          input = {
+            kb_layout = "us";
+            kb_variant = "intl";
+          }
+          // lib.optionalAttrs cfg.isLaptop {
+            touchpad = {
+              natural_scroll = true;
+              disable_while_typing = true;
+            };
+          };
           dwindle = {
             preserve_split = true;
-          };
-        }
-        // lib.optionalAttrs cfg.isLaptop {
-          input.touchpad = {
-            natural_scroll = true;
-            disable_while_typing = true;
           };
         };
 
