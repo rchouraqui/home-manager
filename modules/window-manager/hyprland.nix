@@ -8,7 +8,6 @@
 
 let
   cfg = config.window-manager.hyprland;
-  ipc = "noctalia msg";
   mod = "SUPER";
   lua = lib.generators.mkLuaInline;
   toLua = lib.generators.toLua { multiline = false; };
@@ -321,10 +320,6 @@ in
               render_power = 3;
               color = "rgba(1a1a1aee)";
             };
-          };
-          input = {
-            kb_layout = "us";
-            kb_variant = "intl";
           };
           dwindle = {
             preserve_split = true;
