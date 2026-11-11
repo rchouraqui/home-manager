@@ -133,8 +133,8 @@ in
       ];
     };
     hypridle = true;
-    hyprlock = true;
-    hyprpaper = true;
+    hyprlock = false;
+    hyprpaper = false;
     vicinae = true;
     waybar = false;
     noctalia = true;
