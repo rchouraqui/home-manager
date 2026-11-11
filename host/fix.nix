@@ -166,5 +166,6 @@ in
     blender = true;
     godot = true;
     spice = true;
+    virt-viewer = true;
   };
 }
