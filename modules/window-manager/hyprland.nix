@@ -9,6 +9,7 @@
 let
   cfg = config.window-manager.hyprland;
   mod = "SUPER";
+  ipc = "noctalia msg";
   lua = lib.generators.mkLuaInline;
   toLua = lib.generators.toLua { multiline = false; };
   exec = cmd: "hl.dsp.exec_cmd(${builtins.toJSON cmd})";
