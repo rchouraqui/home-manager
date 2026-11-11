@@ -87,12 +87,9 @@ let
     ''hyprctl setcursor "Catppuccin-Mocha-Dark" 24''
     "pw-metadata -n settings 0 clock.force-quantum 512"
     "xrandr --output ${cfg.primaryMonitor} --primary"
-    #"waybar"
     "noctalia"
-    "swaync"
     "nm-applet --indicator"
     "blueman-applet"
-    "hyprpaper"
     "zen-beta"
     "vesktop"
     "element-desktop"
@@ -123,6 +120,7 @@ let
     (bind "${mod} + SPACE" (exec "vicinae toggle") { })
     (bind "${mod} + M" "hl.dsp.exit()" { })
     (bind "${mod} + J" "hl.dsp.layout(\"togglesplit\")" { })
+    (bind "${mod} + L" (exec "${ipc} session lock") { })
 
     (bind "${mod} + SHIFT + L" (exec "hyprlock") { })
     (bind "${mod} + V" ''hl.dsp.window.float({ action = "toggle" })'' { })
@@ -149,42 +147,29 @@ let
     (bind "${mod} + mouse:272" "hl.dsp.window.drag()" { mouse = true; })
     (bind "${mod} + mouse:273" "hl.dsp.window.resize()" { mouse = true; })
 
-    (bind "XF86AudioRaiseVolume" (exec "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+") {
+    (bind "XF86AudioPlay" (exec "${ipc} media toggle") { })
+    (bind "XF86AudioPrev" (exec "${ipc} media previous") { })
+    (bind "XF86AudioNext" (exec "${ipc} media next") { })
+
+    (bind "XF86AudioLowerVolume" (exec "${ipc} volume-down 5") {
       locked = true;
       repeating = true;
     })
-    (bind "XF86AudioLowerVolume" (exec "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-") {
+    (bind "XF86AudioRaiseVolume" (exec "${ipc} volume-up 5") {
       locked = true;
       repeating = true;
     })
-    (bind "XF86AudioMute" (exec "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle") {
+    (bind "XF86MonBrightnessDown" (exec "${ipc} brightness-down all 5") {
       locked = true;
       repeating = true;
     })
-    (bind "XF86AudioNext" (exec "playerctl next") {
+    (bind "XF86MonBrightnessUp" (exec "${ipc} brightness-up all 5") {
       locked = true;
       repeating = true;
     })
-    (bind "XF86AudioPause" (exec "playerctl play-pause") {
-      locked = true;
-      repeating = true;
-    })
-    (bind "XF86AudioPlay" (exec "playerctl play-pause") {
-      locked = true;
-      repeating = true;
-    })
-    (bind "XF86AudioPrev" (exec "playerctl previous") {
-      locked = true;
-      repeating = true;
-    })
-    (bind "XF86MonBrightnessDown" (exec "brightnessctl set 10%-") {
-      locked = true;
-      repeating = true;
-    })
-    (bind "XF86MonBrightnessUp" (exec "brightnessctl set 10%+ ") {
-      locked = true;
-      repeating = true;
-    })
+
+    (bind "XF86AudioMute" (exec "${ipc} volume-mute") { locked = true; })
+
   ]
   ++ lib.optionals cfg.isLaptop [
     (bind "switch:on:Lid Switch" (exec "clamshell close") { locked = true; })
@@ -244,7 +229,6 @@ in
         grim
         slurp
         wl-clipboard
-        pavucontrol # GUI son
         networkmanagerapplet # fournit nm-connection-editor
         wireplumber # fournit wpctl
         playerctl # pour mpris
