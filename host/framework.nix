@@ -77,14 +77,14 @@ in
           transform = 0;
         }
         {
-          output = "HDMI-A-2";
+          output = "DP-10";
           mode = "1920x1080@100";
           position = "0x0";
           scale = 1;
           transform = 0;
         }
         {
-          output = "DP-4";
+          output = "DP-12";
           mode = "1920x1080@60";
           position = "1920x0";
           scale = 1;
@@ -133,6 +133,7 @@ in
     godot = true;
     spice = true;
     virt-viewer = true;
+    bitwarden = true;
   };
 
 }
