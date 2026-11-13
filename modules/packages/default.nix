@@ -128,6 +128,16 @@ in
       default = false;
       description = "Enable the virt-viewer";
     };
+    bitwarden = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable the Bitwarden";
+    };
+    bootcamp = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable packages for bootcamp";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -147,6 +157,17 @@ in
           [
             element-desktop
             libsecret
+          ]
+        else
+          [ ]
+      )
+      ++ (
+        if cfg.bootcamp then
+          [
+            shellcheck
+            shfmt
+            bats
+            jq
           ]
         else
           [ ]
@@ -173,6 +194,7 @@ in
       ++ (if cfg.blender then [ blender ] else [ ])
       ++ (if cfg.godot then [ godot ] else [ ])
       ++ (if cfg.spice then [ spice ] else [ ])
-      ++ (if cfg.virt-viewer then [ virt-viewer ] else [ ]);
+      ++ (if cfg.virt-viewer then [ virt-viewer ] else [ ])
+      ++ (if cfg.bitwarden then [ bitwarden-desktop ] else [ ]);
   };
 }
